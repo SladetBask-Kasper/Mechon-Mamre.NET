@@ -35,8 +35,6 @@ namespace Mechon_Mamre.NET
             this.Books = new System.Windows.Forms.ComboBox();
             this.Chapters = new System.Windows.Forms.ComboBox();
             this.Output = new System.Windows.Forms.RichTextBox();
-            this.fontSizeSelect = new System.Windows.Forms.NumericUpDown();
-            ((System.ComponentModel.ISupportInitialize)(this.fontSizeSelect)).BeginInit();
             this.SuspendLayout();
             // 
             // bBack
@@ -47,6 +45,7 @@ namespace Mechon_Mamre.NET
             this.bBack.TabIndex = 0;
             this.bBack.Text = "Back";
             this.bBack.UseVisualStyleBackColor = true;
+            this.bBack.Click += new System.EventHandler(this.bBack_Click);
             // 
             // bNext
             // 
@@ -58,6 +57,7 @@ namespace Mechon_Mamre.NET
             this.bNext.TabIndex = 1;
             this.bNext.Text = "Next";
             this.bNext.UseVisualStyleBackColor = true;
+            this.bNext.Click += new System.EventHandler(this.bNext_Click);
             // 
             // Books
             // 
@@ -75,6 +75,7 @@ namespace Mechon_Mamre.NET
             this.Chapters.Name = "Chapters";
             this.Chapters.Size = new System.Drawing.Size(121, 21);
             this.Chapters.TabIndex = 3;
+            this.Chapters.SelectedIndexChanged += new System.EventHandler(this.Chapters_SelectedIndexChanged);
             // 
             // Output
             // 
@@ -88,25 +89,9 @@ namespace Mechon_Mamre.NET
             this.Output.TabIndex = 4;
             this.Output.Text = "";
             // 
-            // fontSizeSelect
-            // 
-            this.fontSizeSelect.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.fontSizeSelect.Location = new System.Drawing.Point(290, 12);
-            this.fontSizeSelect.Name = "fontSizeSelect";
-            this.fontSizeSelect.Size = new System.Drawing.Size(120, 20);
-            this.fontSizeSelect.TabIndex = 5;
-            this.fontSizeSelect.Value = new decimal(new int[] {
-            18,
-            0,
-            0,
-            0});
-            this.fontSizeSelect.ValueChanged += new System.EventHandler(this.fontSizeSelect_ValueChanged);
-            // 
             // Form1
             // 
             this.ClientSize = new System.Drawing.Size(707, 432);
-            this.Controls.Add(this.fontSizeSelect);
             this.Controls.Add(this.Output);
             this.Controls.Add(this.Chapters);
             this.Controls.Add(this.Books);
@@ -115,25 +100,17 @@ namespace Mechon_Mamre.NET
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
-            this.ResizeEnd += new System.EventHandler(this.Form1_ResizeEnd);
-            ((System.ComponentModel.ISupportInitialize)(this.fontSizeSelect)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.RichTextBox richTextBox1;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.ComboBox comboBox2;
         private System.Windows.Forms.Button bBack;
         private System.Windows.Forms.Button bNext;
         private System.Windows.Forms.ComboBox Books;
         private System.Windows.Forms.ComboBox Chapters;
         private System.Windows.Forms.RichTextBox Output;
-        private System.Windows.Forms.NumericUpDown fontSizeSelect;
     }
 }
 

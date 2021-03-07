@@ -1,4 +1,7 @@
-﻿using System;
+﻿///
+/// Source : https://stackoverflow.com/a/33542937/7090007
+///
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
