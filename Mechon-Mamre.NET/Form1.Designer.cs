@@ -66,6 +66,7 @@ namespace Mechon_Mamre.NET
             this.Books.Name = "Books";
             this.Books.Size = new System.Drawing.Size(121, 21);
             this.Books.TabIndex = 2;
+            this.Books.SelectedIndexChanged += new System.EventHandler(this.Books_SelectedIndexChanged);
             // 
             // Chapters
             // 
@@ -88,6 +89,7 @@ namespace Mechon_Mamre.NET
             this.Output.Size = new System.Drawing.Size(711, 391);
             this.Output.TabIndex = 4;
             this.Output.Text = "";
+            this.Output.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Output_KeyUp);
             // 
             // Form1
             // 
