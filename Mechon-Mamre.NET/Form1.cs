@@ -10,6 +10,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Tools;
+using System.Diagnostics;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Layout.Properties;
+using iText.Kernel.Font;
 
 namespace Mechon_Mamre.NET
 {
@@ -28,6 +34,7 @@ namespace Mechon_Mamre.NET
             "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi", "1 Chronicles", 
             "2 Chronicles", "Psalms", "Job", "Proverbs", "Ruth", "Song of Songs", "Ecclesiastes", 
             "Lamentations", "Esther", "Daniel", "Ezra", "Nehemiah" };
+        public string currentPageHebrew = "";
    
         /// <summary>
         /// Source : https://stackoverflow.com/a/27108442/7090007
@@ -37,6 +44,7 @@ namespace Mechon_Mamre.NET
         public string Get(string uri)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+            Console.WriteLine(request.TransferEncoding);
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
             using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
@@ -84,6 +92,7 @@ namespace Mechon_Mamre.NET
             changed_from_chapchange = true;
             changed_from_bookchange = true;
             Chapters.Items.Clear();
+            currentPageHebrew = "";
             Books.SelectedIndex = book - 1;
             string rv = "";
             bool inTag = false;
@@ -94,6 +103,7 @@ namespace Mechon_Mamre.NET
             string chapterData = "";
             string currentTag = "";
             bool shouldAdd = false;
+            bool isHebrew = false;
             for (int i = 0; i < html.Length; i++)
             {
                 char c = html.ElementAt(i);
@@ -121,6 +131,7 @@ namespace Mechon_Mamre.NET
                     inTag = true;
                 }
                 if (shouldAdd && !inTag) rv += c;
+                if (isHebrew && !inTag) currentPageHebrew += c;
                 if (inTag) currentTag += c;
                 if (c=='>')
                 { 
@@ -132,7 +143,15 @@ namespace Mechon_Mamre.NET
                     {
                         shouldAdd = true;
                     }
-                    else if (tag == "</TD>") shouldAdd = false;
+                    else if (tag.Contains("<TD CLASS=H"))
+                    {
+                        isHebrew = true;
+                    }
+                    else if (tag == "</TD>")
+                    {
+                        shouldAdd = false; 
+                        isHebrew = false;
+                    }
                     else if (tag == "<BR>")
                     {
                         if (inChapters)
@@ -154,7 +173,7 @@ namespace Mechon_Mamre.NET
             int main = 0;
             List<int> chaps = new List<int>();
             bool isDoubleBook = false;
-            if (book == 35 || book == 36 || book == 8 || book == 9 || book == 10 || book == 11 || book == 27 || book == 28)
+            if (book == 35 || book == 36 || book == 8 || book == 9 || book == 10 || book == 11 || book == 27 || book == 28 || book == 29)
             {
                 isDoubleBook = true;
                 chapterData = "";
@@ -166,6 +185,7 @@ namespace Mechon_Mamre.NET
                 if (book == 11) max_chap = 25;
                 if (book == 27) max_chap = 29;
                 if (book == 28) max_chap = 36;
+                if (book == 29) max_chap = 150;
                 for (int n = 1; n <= max_chap; n++)
                     Chapters.Items.Add(n);
                 Chapters.SelectedItem = chapter;
@@ -326,6 +346,66 @@ namespace Mechon_Mamre.NET
                 {
                     Output.SaveFile(SaveFileDialog1.FileName, RichTextBoxStreamType.PlainText);
                 }
+                //SaveFileDialog1.Dispose(); // I don't think this line is needed but idk.
+            }
+            else if (e.Control && e.KeyCode == Keys.P)
+            {
+                SaveFileDialog1 = new SaveFileDialog();
+                // SaveFileDialog1.CreatePrompt = true;
+                SaveFileDialog1.OverwritePrompt = true;
+                SaveFileDialog1.FileName = booknames[book - 1] + (chapter).ToString();
+                SaveFileDialog1.DefaultExt = "pdf";
+                SaveFileDialog1.Filter =
+                    "Text files (*.pdf)|*.pdf|All files (*.*)|*.*";
+                SaveFileDialog1.InitialDirectory =
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                //DialogResult result = SaveFileDialog1.ShowDialog();
+                if (SaveFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK &&
+                    SaveFileDialog1.FileName.Length > 0)
+                {
+                    PdfWriter writer = new PdfWriter(SaveFileDialog1.FileName);
+                    PdfDocument pdf = new PdfDocument(writer);
+                    PdfFont normalFont = PdfFontFactory.CreateFont("C:\\Windows\\Fonts\\arial.ttf", "Identity-H", true);
+                    pdf.AddFont(normalFont);
+                    Document document = new Document(pdf);
+                    Paragraph newline = new Paragraph(new Text("\n"));
+                    Paragraph header = new Paragraph(booknames[book - 1] + $" Chapter {chapter}").SetTextAlignment(TextAlignment.CENTER).SetFontSize(20);
+                    document.Add(newline);
+                    document.Add(header);
+                    document.Add(newline);
+
+                    string[] p_tags = Output.Text.Split(new string[] { "\n\n" }, StringSplitOptions.None);
+                    foreach (string p in p_tags)
+                    {
+                        Paragraph paragraph = new Paragraph(p);
+                        document.Add(paragraph);
+                    }
+
+                    /*header = new Paragraph("Auf Ivrit").SetTextAlignment(TextAlignment.CENTER).SetFontSize(20);
+                    document.Add(newline);
+                    document.Add(header);
+                    document.Add(newline);
+
+                    p_tags = currentPageHebrew.Split(new string[] { "\n\n" }, StringSplitOptions.None);
+                    foreach (string p in p_tags)
+                    {
+                        Paragraph paragraph = new Paragraph(p);
+                        document.Add(paragraph);
+                    }*/
+
+                    // Page numbers
+                    /*int n = pdf.GetNumberOfPages();
+                    for (int i = 1; i <= n; i++)
+                    {
+                        document.ShowTextAligned(new Paragraph(String
+                           .Format("page" + i + " of " + n)),
+                            559, 806, i, TextAlignment.RIGHT,
+                            VerticalAlignment.TOP, 0);
+                    }*/
+
+                    document.Close();
+                }
+                
             }
         }
     }
